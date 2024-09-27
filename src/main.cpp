@@ -1,18 +1,58 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+const int buttonPinIncrease = 8; // Button to increase count
+const int buttonPinDecrease = 9; // Button to decrease count
+int peopleCount = 0;
+
+int lastButtonStateIncrease = HIGH;
+int lastButtonStateDecrease = HIGH;
+unsigned long lastDebounceTimeIncrease = 0;
+unsigned long lastDebounceTimeDecrease = 0;
+unsigned long debounceDelay = 50;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  pinMode(buttonPinIncrease, INPUT_PULLUP);
+  pinMode(buttonPinDecrease, INPUT_PULLUP);
+
+  Serial.begin(9600);
+
+  Serial.println("People counter system started");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  int currentButtonStateIncrease = digitalRead(buttonPinIncrease);
+  int currentButtonStateDecrease = digitalRead(buttonPinDecrease);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  // increase
+  if (currentButtonStateIncrease != lastButtonStateIncrease) {
+    if (currentButtonStateIncrease == LOW && (millis() - lastDebounceTimeIncrease > debounceDelay)) {
+      peopleCount++;
+
+      Serial.print("Person entered at time: ");
+      Serial.print(millis() / 1000);
+      Serial.print(" seconds. Total people: ");
+      Serial.println(peopleCount);
+
+      lastDebounceTimeIncrease = millis();
+    }
+  }
+
+  // decrease
+  if (currentButtonStateDecrease != lastButtonStateDecrease) {
+    if (currentButtonStateDecrease == LOW && (millis() - lastDebounceTimeDecrease > debounceDelay)) {
+      if (peopleCount > 0) {
+        peopleCount--;
+      }
+
+      Serial.print("Person left at time: ");
+      Serial.print(millis() / 1000);
+      Serial.print(" seconds. Total people: ");
+      Serial.println(peopleCount);
+
+      lastDebounceTimeDecrease = millis();
+    }
+  }
+
+  lastButtonStateIncrease = currentButtonStateIncrease;
+  lastButtonStateDecrease = currentButtonStateDecrease;
 }
