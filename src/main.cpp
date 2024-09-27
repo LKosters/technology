@@ -1,18 +1,22 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+const int ledPin = 4;
+const int buttonPin = 8;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  pinMode(ledPin, OUTPUT);
+
+  pinMode(buttonPin, INPUT_PULLUP);
+
+  Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  int buttonState = digitalRead(buttonPin);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  if (buttonState == LOW) {
+    digitalWrite(ledPin, HIGH);
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
 }
