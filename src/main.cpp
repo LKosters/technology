@@ -1,58 +1,55 @@
 #include <Arduino.h>
 
-const int buttonPinIncrease = 8; // Button to increase count
-const int buttonPinDecrease = 9; // Button to decrease count
-int peopleCount = 0;
+const int led1 = 4;
+const int led2 = 5;
+const int led3 = 6;
 
-int lastButtonStateIncrease = HIGH;
-int lastButtonStateDecrease = HIGH;
-unsigned long lastDebounceTimeIncrease = 0;
-unsigned long lastDebounceTimeDecrease = 0;
+const int buttonPin = 8;
+
+int currentLed = 1;
+
+int lastButtonState = HIGH;
+unsigned long lastDebounceTime = 0;
 unsigned long debounceDelay = 50;
 
 void setup() {
-  pinMode(buttonPinIncrease, INPUT_PULLUP);
-  pinMode(buttonPinDecrease, INPUT_PULLUP);
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
 
-  Serial.begin(9600);
+  pinMode(buttonPin, INPUT_PULLUP);
 
-  Serial.println("People counter system started");
+  digitalWrite(led1, HIGH);
 }
 
 void loop() {
-  int currentButtonStateIncrease = digitalRead(buttonPinIncrease);
-  int currentButtonStateDecrease = digitalRead(buttonPinDecrease);
+  int currentButtonState = digitalRead(buttonPin);
 
-  // increase
-  if (currentButtonStateIncrease != lastButtonStateIncrease) {
-    if (currentButtonStateIncrease == LOW && (millis() - lastDebounceTimeIncrease > debounceDelay)) {
-      peopleCount++;
+  if (currentButtonState != lastButtonState) {
+    if (currentButtonState == LOW && (millis() - lastDebounceTime > debounceDelay)) {
+      digitalWrite(led1, LOW);
+      digitalWrite(led2, LOW);
+      digitalWrite(led3, LOW);
 
-      Serial.print("Person entered at time: ");
-      Serial.print(millis() / 1000);
-      Serial.print(" seconds. Total people: ");
-      Serial.println(peopleCount);
-
-      lastDebounceTimeIncrease = millis();
-    }
-  }
-
-  // decrease
-  if (currentButtonStateDecrease != lastButtonStateDecrease) {
-    if (currentButtonStateDecrease == LOW && (millis() - lastDebounceTimeDecrease > debounceDelay)) {
-      if (peopleCount > 0) {
-        peopleCount--;
+      if (currentLed == 1) {
+        currentLed = 2;
+      } else if (currentLed == 2) {
+        currentLed = 3;
+      } else {
+        currentLed = 1;
       }
 
-      Serial.print("Person left at time: ");
-      Serial.print(millis() / 1000);
-      Serial.print(" seconds. Total people: ");
-      Serial.println(peopleCount);
+      if (currentLed == 1) {
+        digitalWrite(led1, HIGH);
+      } else if (currentLed == 2) {
+        digitalWrite(led2, HIGH);
+      } else if (currentLed == 3) {
+        digitalWrite(led3, HIGH);
+      }
 
-      lastDebounceTimeDecrease = millis();
+      lastDebounceTime = millis();
     }
   }
 
-  lastButtonStateIncrease = currentButtonStateIncrease;
-  lastButtonStateDecrease = currentButtonStateDecrease;
+  lastButtonState = currentButtonState;
 }
