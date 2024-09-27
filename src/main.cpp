@@ -1,18 +1,35 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+const int buttonPin = 8;
+int peopleCount = 0;
+
+int lastButtonState = HIGH;
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  pinMode(buttonPin, INPUT_PULLUP);
+
+  Serial.begin(9600);
+
+  Serial.println("People counter system started");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  int currentButtonState = digitalRead(buttonPin);
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  if (currentButtonState != lastButtonState) {
+    if (currentButtonState == LOW && (millis() - lastDebounceTime > debounceDelay)) {
+      peopleCount++;
+
+      Serial.print("Person entered at time: ");
+      Serial.print(millis() / 1000);
+      Serial.print(" seconds. Total people: ");
+      Serial.println(peopleCount);
+
+      lastDebounceTime = millis();
+    }
+  }
+
+  lastButtonState = currentButtonState;
 }
