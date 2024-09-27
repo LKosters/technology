@@ -1,18 +1,26 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+unsigned long previousMillis = 0;
+const long interval = 200;
+bool ledState = LOW;
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  pinMode(4, OUTPUT);
+  
+  Serial.begin(9600);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+  unsigned long currentMillis = millis();
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    ledState = !ledState;
+
+    digitalWrite(4, ledState);
+
+    Serial.print("LED state changed at: ");
+    Serial.println(currentMillis);
+  }
 }
